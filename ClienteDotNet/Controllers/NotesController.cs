@@ -18,8 +18,8 @@ namespace ClienteDotNet.Controllers
         //construtor
         public NotesController()
         {
-            //endereço base
-            client.BaseAddress = new Uri("http://devmedianotesapi.azurewebsites.net");
+            //endereço base, para onde sera enviado a requisição
+            client.BaseAddress = new Uri("http://localhost/WebApi/");
             //configura os header, no caso está excluindo todos 
             client.DefaultRequestHeaders.Accept.Clear();
             //informa que vou enviar e receber dados do tipo json
@@ -32,7 +32,7 @@ namespace ClienteDotNet.Controllers
         {
             List<Note> notes = new List<Note>();
             //Mensagem de retorno
-            HttpResponseMessage responde = client.GetAsync("api/notes").Result;
+            HttpResponseMessage responde = client.GetAsync("api/Notes").Result;
             if(responde.IsSuccessStatusCode)
             {
                 notes = responde.Content.ReadAsAsync<List<Note>>().Result;
@@ -44,7 +44,7 @@ namespace ClienteDotNet.Controllers
         public ActionResult Details(int id)
         {
             //vai até o serviço buscar o objeto
-            HttpResponseMessage response = client.GetAsync($"/api/notes/{id}").Result;
+            HttpResponseMessage response = client.GetAsync($"api/Notes/{id}").Result;
             //Pega de fato o objeto que retornou do serviço
             Note note = response.Content.ReadAsAsync<Note>().Result;
             if (note != null)
@@ -66,7 +66,7 @@ namespace ClienteDotNet.Controllers
             try
             {
                 //vai até o serviço buscar o objeto
-                HttpResponseMessage response = client.PostAsJsonAsync<Note>("api/notes", note).Result;
+                HttpResponseMessage response = client.PostAsJsonAsync<Note>("api/Notes", note).Result;
                 if(response.StatusCode == System.Net.HttpStatusCode.Created)
                 {
                     return RedirectToAction("Index");
@@ -87,7 +87,7 @@ namespace ClienteDotNet.Controllers
         public ActionResult Edit(int id)
         {
             //vai até o serviço buscar o objeto
-            HttpResponseMessage response = client.GetAsync($"/api/notes/{id}").Result;
+            HttpResponseMessage response = client.GetAsync($"api/Notes/{id}").Result;
             Note note = response.Content.ReadAsAsync<Note>().Result;
             if (note != null)
                 return View(note);
@@ -102,7 +102,7 @@ namespace ClienteDotNet.Controllers
             try
             {
                 //vai até o serviço buscar o objeto
-                HttpResponseMessage response = client.PutAsJsonAsync<Note>($"api/notes/{id}", note).Result;
+                HttpResponseMessage response = client.PutAsJsonAsync<Note>($"api/Notes/{id}", note).Result;
                 if (response.StatusCode == System.Net.HttpStatusCode.Created)
                 {
                     return RedirectToAction("Index");
@@ -123,13 +123,16 @@ namespace ClienteDotNet.Controllers
         public ActionResult Delete(int id)
         {
             //vai no serviço e busca 1 objeto
-            HttpResponseMessage response = client.GetAsync($"/api/notes/{id}").Result;
+            HttpResponseMessage response = client.GetAsync($"api/Notes/{id}").Result;
             //Pega de fato o objeto que retornou do serviço
             Note note = response.Content.ReadAsAsync<Note>().Result;
             if (note != null)
                 return View(note);
             else
+            {
+                ViewBag.Error = "Error while creating note";
                 return HttpNotFound();
+            }
         }
 
         // POST: Notes/Delete/5
@@ -139,7 +142,7 @@ namespace ClienteDotNet.Controllers
             try
             {
                 //vai até o serviço buscar o objeto
-                HttpResponseMessage response = client.DeleteAsync($"api/notes/{id}").Result;
+                HttpResponseMessage response = client.DeleteAsync($"api/Notes/{id}").Result;
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     return RedirectToAction("Index");
